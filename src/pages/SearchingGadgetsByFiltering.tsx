@@ -5,19 +5,41 @@ import {
   useGetGadgetsByFilteringQuery,
 } from "@/redux/features/electricGadgetsManagement.Api";
 const { Option } = Select;
-import moment from "moment";
 import { useAddsalesMutation } from "@/redux/features/salesManagement.Api";
 import { Link } from "react-router-dom";
 import { ElectricGadget } from "./CreateElectricGadgets";
+import dayjs from "dayjs";
+
+interface SellFormData {
+  productId?: string; // Adjust the type according to your actual data type for productId
+  quantity: number;
+  buyerName: string;
+  saleDate: Date | null;
+}
 
 const ElectricGadgetFilter: React.FC = () => {
-  const [categoryOptions, setcategoryOptions] = useState([]);
-  const [brandOptions, setbrandOptions] = useState([]);
-  const [modelNumberOptions, setmodelNumberOptions] = useState([]);
-  const [operatingSystemOptions, setoperatingSystemOptions] = useState([]);
-  const [powerSourceOptions, setpowerSourceOptions] = useState([]);
-  const [featuresOptions, setfeaturesOptions] = useState([]);
-  const [connectivityOptions, setConnectivityOptions] = useState([]);
+  const [categoryOptions, setcategoryOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [brandOptions, setbrandOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [modelNumberOptions, setmodelNumberOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [operatingSystemOptions, setoperatingSystemOptions] = useState<
+    { value: string | undefined; label: string | undefined }[]
+  >([]);
+  const [powerSourceOptions, setpowerSourceOptions] = useState<
+    { value: string | undefined; label: string | undefined }[]
+  >([]);
+  const [featuresOptions, setfeaturesOptions] = useState<
+    { value: string | undefined; label: string | undefined }[]
+  >([]);
+  const [connectivityOptions, setConnectivityOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+
   const [filterOptions, setFilterOptions] = useState({
     priceRange: [0, 99990],
     releaseDate: undefined,
@@ -31,10 +53,10 @@ const ElectricGadgetFilter: React.FC = () => {
   });
   const [sellModalVisible, setSellModalVisible] = useState(false);
 
-  const [sellFormData, setSellFormData] = useState({
+  const [sellFormData, setSellFormData] = useState<SellFormData>({
     quantity: 1,
     buyerName: "",
-    saleDate: null, // Set initial value as null
+    saleDate: null,
   });
 
   const handleSellClick = (product: ElectricGadget) => {
@@ -66,6 +88,8 @@ const ElectricGadgetFilter: React.FC = () => {
         return;
       }
 
+      console.log("sellFormData", sellFormData);
+
       const sellProduct = {
         productId: sellFormData.productId,
         quantity: sellFormData.quantity,
@@ -80,6 +104,7 @@ const ElectricGadgetFilter: React.FC = () => {
   };
 
   const { data: gadgetsData } = useGetAllGadgetsQuery(undefined);
+
   //This is for category
   useEffect(() => {
     // Generate options for the Brand Select based on gadgetData
@@ -133,18 +158,22 @@ const ElectricGadgetFilter: React.FC = () => {
   //This is for features
   useEffect(() => {
     // Generate options for the Power Source Select based on gadgetData
-    const options = gadgetsData?.data?.reduce((acc, item) => {
-      // Assuming item.power is an array
-      if (Array.isArray(item.features)) {
-        item.features.forEach((featuresItem) => {
-          acc.push({
-            value: featuresItem,
-            label: featuresItem,
-          });
-        });
-      }
-      return acc;
-    }, []);
+    const options =
+      gadgetsData?.data?.reduce<{ value: string; label: string }[]>(
+        (acc, item) => {
+          if (Array.isArray(item.features)) {
+            item.features.forEach((featuresItem) => {
+              acc.push({
+                value: featuresItem || "", // Provide a default value if featuresItem is undefined
+                label: featuresItem || "",
+              });
+            });
+          }
+          return acc;
+        },
+        []
+      ) || [];
+    setfeaturesOptions(options);
 
     setfeaturesOptions(options || []);
   }, [gadgetsData]);
@@ -152,22 +181,25 @@ const ElectricGadgetFilter: React.FC = () => {
   //This is for connectivity
   useEffect(() => {
     // Generate options for the Power Source Select based on gadgetData
-    const options = gadgetsData?.data?.reduce((acc, item) => {
-      // Assuming item.power is an array
-      if (Array.isArray(item.connectivity)) {
-        item.connectivity.forEach((connectivityItem) => {
-          acc.push({
-            value: connectivityItem,
-            label: connectivityItem,
-          });
-        });
-      }
-      return acc;
-    }, []);
-
-    setConnectivityOptions(options || []);
+    const options =
+      gadgetsData?.data?.reduce<{ value: string; label: string }[]>(
+        (acc, item) => {
+          if (Array.isArray(item.connectivity)) {
+            item.connectivity.forEach((connectivityItem) => {
+              acc.push({
+                value: connectivityItem || "", // Provide a default value if connectivityItem is undefined
+                label: connectivityItem || "",
+              });
+            });
+          }
+          return acc;
+        },
+        []
+      ) || [];
+    setConnectivityOptions(options);
   }, [gadgetsData]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleFilterChange = (key: string, value: any) => {
     setFilterOptions((prevOptions) => ({
       ...prevOptions,
@@ -178,6 +210,7 @@ const ElectricGadgetFilter: React.FC = () => {
     }));
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleMultiSelectChange = (key: string, values: any[]) => {
     setFilterOptions((prevOptions) => ({
       ...prevOptions,
@@ -481,7 +514,7 @@ const ElectricGadgetFilter: React.FC = () => {
             title: "Actions",
             dataIndex: "actions",
             key: "actions",
-            render: (_, record) => (
+            render: (_, record: ElectricGadget) => (
               <>
                 <Button onClick={() => handleSellClick(record)}>Sell</Button>
                 <Link to={`gadget-details/${record._id}`}>
@@ -491,9 +524,9 @@ const ElectricGadgetFilter: React.FC = () => {
             ),
           },
         ]}
-        dataSource={(gadgetsDataByFiltering?.data || []).filter(
-          (product) => product.quantity > 0
-        )}
+        dataSource={(
+          (gadgetsDataByFiltering?.data?.response || []) as ElectricGadget[]
+        ).filter((product) => product.quantity > 0)}
       />
 
       {/* Sell Modal */}
@@ -529,11 +562,11 @@ const ElectricGadgetFilter: React.FC = () => {
         <DatePicker
           style={{ marginRight: 16 }}
           placeholder="Sale Date"
-          value={sellFormData.saleDate ? moment(sellFormData.saleDate) : null}
-          onChange={(date) =>
+          value={sellFormData.saleDate ? dayjs(sellFormData.saleDate) : null}
+          onChange={(date, dateString) =>
             setSellFormData({
               ...sellFormData,
-              saleDate: date ? moment(date).format("YYYY-MM-DD") : null,
+              saleDate: date ? new Date(dateString) : null,
             })
           }
         />

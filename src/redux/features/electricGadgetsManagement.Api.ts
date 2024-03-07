@@ -72,7 +72,7 @@ const gadgetsManagementApi = baseApi.injectEndpoints({
       providesTags: ["gadget", "sale"],
       transformResponse: (response: TResponseRedux<ElectricGadget[]>) => {
         return {
-          data: response,
+          data: { response },
         };
       },
     }),
