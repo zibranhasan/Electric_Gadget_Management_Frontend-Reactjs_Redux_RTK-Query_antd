@@ -23,6 +23,7 @@ const SingleElectricGadgetsDetails = () => {
       navigate("/dashboard/get-electric-gadgets-by-filtering");
     } catch (error) {
       console.error("Error deleting gadget:", error);
+      message.error("Failed to delete gadget. Please try again.");
     }
   };
 
