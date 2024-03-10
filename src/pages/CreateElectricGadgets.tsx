@@ -79,7 +79,7 @@ const CreateElectricGadgets = () => {
         style={{ width: "100%" }}
         format="YYYY-MM-DD"
         {...register("releaseDate")}
-        onChange={(date, dateString) =>
+        onChange={(_date, dateString) =>
           setValue("releaseDate", dateString, { shouldDirty: true })
         }
       />

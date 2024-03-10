@@ -4,12 +4,27 @@ import { TUser, userCurrentToken } from "../../redux/features/auth/authSlice";
 import { verifyToken } from "../../utils/verifyToken";
 import { sidebarItemsGenerator } from "@/utils/sidebarItemsGenerator";
 import { userPaths } from "@/routes/user.routes";
+import { Key } from "antd/es/table/interface";
 
 const { Sider } = Layout;
 
 const userRole = {
   USER: "user",
 };
+
+interface MenuItemType {
+  key: Key;
+  // Other properties specific to your MenuItemType
+}
+
+type ItemType<T = MenuItemType> = {
+  key: Key;
+  icon?: React.ReactNode;
+  title?: React.ReactNode;
+  disabled?: boolean;
+  // Other properties specific to your ItemType
+  children?: ItemType<T>[];
+} & T;
 
 const Sidebar = () => {
   const token = useAppSelector(userCurrentToken);
@@ -22,11 +37,15 @@ const Sidebar = () => {
 
   console.log("user from sidebar", user);
 
-  let sidebarItems;
+  let sidebarItems:
+    | import("antd/es/menu/hooks/useItems").ItemType<MenuItemType>[]
+    | undefined;
 
   switch ((user as TUser)!.role) {
     case userRole.USER:
-      sidebarItems = sidebarItemsGenerator(userPaths);
+      sidebarItems = sidebarItemsGenerator(
+        userPaths
+      ) as ItemType<MenuItemType>[];
   }
 
   return (
