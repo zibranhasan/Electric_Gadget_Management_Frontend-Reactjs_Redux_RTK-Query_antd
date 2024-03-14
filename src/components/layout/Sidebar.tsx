@@ -35,7 +35,7 @@ const Sidebar = () => {
     user = verifyToken(token);
   }
 
-  console.log("user from sidebar", user);
+  // console.log("user from sidebar", user);
 
   let sidebarItems:
     | import("antd/es/menu/hooks/useItems").ItemType<MenuItemType>[]

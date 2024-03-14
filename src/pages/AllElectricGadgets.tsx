@@ -23,7 +23,7 @@ const ElectricGadgetsManagement = () => {
   } = useGetAllGadgetsQuery(undefined);
   const [deleteGadgets] = useDeleteMulipleGadgetMutation();
 
-  console.log("Gadgets data", gadgetsData);
+  // console.log("Gadgets data", gadgetsData);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const ElectricGadgetsManagement = () => {
     try {
       deleteGadgets({ gadgetIds: selectedRowKeys });
     } catch (error) {
-      console.error("Error deleting gadgets:", error);
+      // console.error("Error deleting gadgets:", error);
     }
   };
 

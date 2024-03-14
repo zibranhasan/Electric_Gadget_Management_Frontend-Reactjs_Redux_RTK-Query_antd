@@ -88,7 +88,7 @@ const ElectricGadgetFilter: React.FC = () => {
         return;
       }
 
-      console.log("sellFormData", sellFormData);
+      // console.log("sellFormData", sellFormData);
 
       const sellProduct = {
         productId: sellFormData.productId,
@@ -219,23 +219,23 @@ const ElectricGadgetFilter: React.FC = () => {
   };
 
   const handleFilterSubmit = () => {
-    const formattedFilterOptions = {
-      ...filterOptions,
-      priceRange: {
-        min: filterOptions.priceRange[0],
-        max: filterOptions.priceRange[1],
-      },
-      releaseDate: filterOptions.releaseDate
-        ? new Date(filterOptions.releaseDate).toISOString()
-        : null,
-    };
-    console.log(formattedFilterOptions);
+    // const formattedFilterOptions = {
+    //   ...filterOptions,
+    //   priceRange: {
+    //     min: filterOptions.priceRange[0],
+    //     max: filterOptions.priceRange[1],
+    //   },
+    //   releaseDate: filterOptions.releaseDate
+    //     ? new Date(filterOptions.releaseDate).toISOString()
+    //     : null,
+    // };
+    // console.log(formattedFilterOptions);
   };
 
   const { data: gadgetsDataByFiltering, isFetching } =
     useGetGadgetsByFilteringQuery(filterOptions);
 
-  console.log("gadgetsDataByFiltering", gadgetsDataByFiltering);
+  // console.log("gadgetsDataByFiltering", gadgetsDataByFiltering);
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },

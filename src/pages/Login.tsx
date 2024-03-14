@@ -27,7 +27,7 @@ const LoginPage: React.FC = () => {
   };
 
   const onFinish = async (values: any) => {
-    console.log("Success:", values);
+    // console.log("Success:", values);
 
     const userInfo = {
       username: values.username,
@@ -37,11 +37,11 @@ const LoginPage: React.FC = () => {
     try {
       const res = await login(userInfo).unwrap();
 
-      console.log("response", res);
+      // console.log("response", res);
 
       const user = verifyToken(res.token);
 
-      console.log("finding user from token", user);
+      // console.log("finding user from token", user);
 
       dispatch(setUser({ user: user, token: res.token }));
       navigate("/dashboard");

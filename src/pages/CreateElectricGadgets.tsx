@@ -2,10 +2,13 @@ import { useAddGadgetsMutation } from "@/redux/features/electricGadgetsManagemen
 import { Form, Input, Button, DatePicker, message } from "antd";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import Dropzone from "react-dropzone";
+import axios from "axios";
 
 export interface ElectricGadget {
   _id: string;
   name: string;
+  photo: File | null;
   price: number;
   quantity: number;
   releaseDate: string;
@@ -25,17 +28,34 @@ interface FormData extends ElectricGadget {
 }
 
 const CreateElectricGadgets = () => {
+  // Move the function declaration to the top of the component
+
   const { register, handleSubmit, setValue } = useForm<FormData>();
   const [addGadgets, { isLoading }] = useAddGadgetsMutation(); //eta hocce main.
   const navigate = useNavigate();
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
+    const formData = new FormData();
+    formData.append("image", data.photo);
+
+    const response = await axios.post(
+      "https://api.imgbb.com/1/upload?key=963ca9297bc7cea248773301a33b8428",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data", // Set proper content type for FormData
+        },
+      }
+    );
+
     // Convert comma-separated strings to arrays
     const formattedData = {
       ...data,
+      photo: response.data.data.display_url,
       connectivity: data.connectivity ? data.connectivity.split(", ") : [],
       features: data.features ? data.features.split(", ") : [],
     };
+
     try {
       // Trigger the mutation
       await addGadgets(formattedData);
@@ -61,10 +81,33 @@ const CreateElectricGadgets = () => {
           onChange={(e) => setValue("name", e.target.value)}
         />
       </Form.Item>
+      {/* Photo field using react-dropzone */}
+      <Form.Item label="Photo">
+        <Dropzone
+          onDrop={(acceptedFiles) => {
+            setValue("photo", acceptedFiles[0]);
+          }}
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div
+              {...getRootProps()}
+              style={{
+                border: "1px dashed #ccc",
+                padding: "20px",
+                cursor: "pointer",
+              }}
+            >
+              <input {...getInputProps()} />
+              <p>Drag 'n' drop some files here, or click to select files</p>
+            </div>
+          )}
+        </Dropzone>
+      </Form.Item>
+
       <Form.Item label="Price">
         <Input
           type="number" // Set type to "number"
-          {...register("price", { valueAsNumber: true })} // Use valueAsNumber option
+          {...register("price")} // Use valueAsNumber option
           onChange={(e) => setValue("price", parseFloat(e.target.value))}
         />
       </Form.Item>
@@ -137,9 +180,10 @@ const CreateElectricGadgets = () => {
       </Form.Item>
 
       <Form.Item>
-        <Button loading={isLoading} htmlType="submit">
+        {/* <Button loading={isLoading} htmlType="submit">
           Submit
-        </Button>
+        </Button> */}
+        <Button htmlType="submit">Submit</Button>
       </Form.Item>
     </Form>
   );

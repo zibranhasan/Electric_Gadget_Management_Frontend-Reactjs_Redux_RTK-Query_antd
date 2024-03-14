@@ -11,6 +11,8 @@ const SingleElectricGadgetsDetails = () => {
   const { data: singleGadgetData, isLoading } = useGetGadgetsByIdQuery(_id);
   const navigate = useNavigate();
 
+  console.log("singleGadgetData", singleGadgetData);
+
   const [removeGadgets, { isLoading: deleteLoading, isError: deleteError }] =
     useDeleteGadgetsMutation();
 
@@ -29,6 +31,7 @@ const SingleElectricGadgetsDetails = () => {
 
   const {
     brand,
+    photo,
     category,
     connectivity,
     features,
@@ -59,37 +62,44 @@ const SingleElectricGadgetsDetails = () => {
   return (
     <div style={{ padding: "24px" }}>
       <Card title={name} bordered={false}>
-        <p>
-          <strong>Brand:</strong> {brand}
-        </p>
-        <p>
-          <strong>Category:</strong> {category}
-        </p>
-        <p>
-          <strong>Model Number:</strong> {modelNumber}
-        </p>
-        <p>
-          <strong>Power Source:</strong> {powerSource}
-        </p>
-        <p>
-          <strong>Price:</strong> {price}
-        </p>
-        <p>
-          <strong>Quantity:</strong> {quantity}
-        </p>
-        <p>
-          <strong>Release Date:</strong> {releaseDate}
-        </p>
-        <p>
-          <strong>Weight:</strong> {weight}
-        </p>
-        <p>
-          <strong>Connectivity:</strong>{" "}
-          {connectivity && connectivity.join(", ")}
-        </p>
-        <p>
-          <strong>Features:</strong> {features && features.join(", ")}
-        </p>
+        <div style={{ display: "flex" }}>
+          <div style={{ marginRight: "24px" }}>
+            <img src={photo} alt={name} style={{ maxWidth: "200px" }} />
+          </div>
+          <div>
+            <p>
+              <strong>Brand:</strong> {brand}
+            </p>
+            <p>
+              <strong>Category:</strong> {category}
+            </p>
+            <p>
+              <strong>Model Number:</strong> {modelNumber}
+            </p>
+            <p>
+              <strong>Power Source:</strong> {powerSource}
+            </p>
+            <p>
+              <strong>Price:</strong> {price}
+            </p>
+            <p>
+              <strong>Quantity:</strong> {quantity}
+            </p>
+            <p>
+              <strong>Release Date:</strong> {releaseDate}
+            </p>
+            <p>
+              <strong>Weight:</strong> {weight}
+            </p>
+            <p>
+              <strong>Connectivity:</strong>{" "}
+              {connectivity && connectivity.join(", ")}
+            </p>
+            <p>
+              <strong>Features:</strong> {features && features.join(", ")}
+            </p>
+          </div>
+        </div>
 
         <Space>
           <Popconfirm
