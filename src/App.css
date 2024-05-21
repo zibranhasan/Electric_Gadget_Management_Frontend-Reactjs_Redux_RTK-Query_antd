@@ -1,0 +1,38 @@
+.custom-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.custom-card .ant-card-actions {
+  border-top: 1px solid #f0f0f0;
+}
+
+.custom-button {
+  background-color: #1890ff;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  padding: 0 15px;
+  font-size: 14px;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.custom-button:hover {
+  background-color: #40a9ff;
+  transform: translateY(-2px);
+}
+
+.custom-button:active {
+  background-color: #096dd9;
+}
+
+.custom-button:focus {
+  outline: none;
+}
+
+.ant-card-cover img {
+  border-bottom: 1px solid #f0f0f0;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}

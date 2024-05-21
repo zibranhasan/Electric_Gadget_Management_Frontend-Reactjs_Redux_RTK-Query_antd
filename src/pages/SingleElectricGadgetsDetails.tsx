@@ -11,8 +11,6 @@ const SingleElectricGadgetsDetails = () => {
   const { data: singleGadgetData, isLoading } = useGetGadgetsByIdQuery(_id);
   const navigate = useNavigate();
 
-  console.log("singleGadgetData", singleGadgetData);
-
   const [removeGadgets, { isLoading: deleteLoading, isError: deleteError }] =
     useDeleteGadgetsMutation();
 
@@ -22,7 +20,7 @@ const SingleElectricGadgetsDetails = () => {
       await removeGadgets(gadgetId);
       message.success("Gadget deleted successfully");
       // Redirect to the specified URL after successful creation
-      navigate("/dashboard/get-electric-gadgets-by-filtering");
+      navigate("/dashboard/manager/get-electric-gadgets-by-filtering");
     } catch (error) {
       console.error("Error deleting gadget:", error);
       message.error("Failed to delete gadget. Please try again.");
@@ -118,7 +116,7 @@ const SingleElectricGadgetsDetails = () => {
           </Popconfirm>
 
           <Link
-            to={`/dashboard/get-electric-gadgets-by-filtering/gadget-details/${gadgetId}/update`}
+            to={`/dashboard/manager/get-electric-gadgets-by-filtering/gadget-details/${gadgetId}/update`}
           >
             <Button>Update</Button>
           </Link>

@@ -3,13 +3,16 @@ import { useAppSelector } from "../../redux/hooks";
 import { TUser, userCurrentToken } from "../../redux/features/auth/authSlice";
 import { verifyToken } from "../../utils/verifyToken";
 import { sidebarItemsGenerator } from "@/utils/sidebarItemsGenerator";
-import { userPaths } from "@/routes/user.routes";
 import { Key } from "antd/es/table/interface";
+import { managerPaths } from "@/routes/manager.routes";
+
+import { NavLink } from "react-router-dom";
 
 const { Sider } = Layout;
 
 const userRole = {
   USER: "user",
+  MANAGER: "manager",
 };
 
 interface MenuItemType {
@@ -42,10 +45,23 @@ const Sidebar = () => {
     | undefined;
 
   switch ((user as TUser)!.role) {
-    case userRole.USER:
+    case userRole.MANAGER:
       sidebarItems = sidebarItemsGenerator(
-        userPaths
+        managerPaths,
+        userRole.MANAGER
       ) as ItemType<MenuItemType>[];
+      break;
+    case userRole.USER:
+      sidebarItems = [
+        {
+          key: "Products",
+          label: <NavLink to="/dashboard/user/products">All Products</NavLink>,
+        },
+        {
+          key: "Checkout",
+          label: <NavLink to="/dashboard/user/checkout">Checkout</NavLink>,
+        },
+      ];
   }
 
   return (

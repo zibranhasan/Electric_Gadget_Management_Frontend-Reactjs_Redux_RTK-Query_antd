@@ -3,7 +3,7 @@ import React from "react";
 import { Button, Form, Input } from "antd";
 import { useAppDispatch } from "@/redux/hooks";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
-import { setUser } from "@/redux/features/auth/authSlice";
+import { TUser, setUser } from "@/redux/features/auth/authSlice";
 import { verifyToken } from "@/utils/verifyToken";
 import { useNavigate } from "react-router-dom";
 
@@ -39,12 +39,13 @@ const LoginPage: React.FC = () => {
 
       // console.log("response", res);
 
-      const user = verifyToken(res.token);
+      const user = verifyToken(res.token) as TUser;
 
       // console.log("finding user from token", user);
 
       dispatch(setUser({ user: user, token: res.token }));
-      navigate("/dashboard");
+      navigate(`/dashboard/${user.role}`);
+      // navigate(`/dashboard/${user.role}`);
     } catch (error) {
       console.error("Error:", error);
     }

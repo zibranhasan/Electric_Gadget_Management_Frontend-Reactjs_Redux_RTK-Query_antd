@@ -43,7 +43,7 @@ const ElectricGadgetsManagement = () => {
     );
 
     // Redirect to the form with pre-filled data
-    navigate("/dashboard/get-electric-gadgets/duplicateform", {
+    navigate("/dashboard/manager/get-electric-gadgets/duplicateform", {
       state: { preFilledData: selectedProduct },
     });
   };

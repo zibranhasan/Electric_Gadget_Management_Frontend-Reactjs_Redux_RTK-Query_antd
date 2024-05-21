@@ -1,12 +1,14 @@
 import { TSidebarItem, TUserPath } from "@/types/sidebar.types";
 import { NavLink } from "react-router-dom";
 
-export const sidebarItemsGenerator = (items: TUserPath[]) => {
+export const sidebarItemsGenerator = (items: TUserPath[], role: string) => {
   const sidebarItems = items.reduce((acc: TSidebarItem[], item) => {
     if (item.path && item.name) {
       acc.push({
         key: item.name,
-        label: <NavLink to={`/dashboard/${item.path}`}>{item.name}</NavLink>,
+        label: (
+          <NavLink to={`/dashboard/${role}/${item.path}`}>{item.name}</NavLink>
+        ),
       });
     }
     if (item.children) {
@@ -18,7 +20,9 @@ export const sidebarItemsGenerator = (items: TUserPath[]) => {
             return {
               key: child.name,
               label: (
-                <NavLink to={`/dashboard/${child.path}`}>{child.name}</NavLink>
+                <NavLink to={`/dashboard/${role}/${child.path}`}>
+                  {child.name}
+                </NavLink>
               ),
             };
           }
@@ -31,27 +35,3 @@ export const sidebarItemsGenerator = (items: TUserPath[]) => {
 
   return sidebarItems;
 };
-// const items: MenuProps["items"] = [
-//   {
-//     key: "Dashboard",
-//     label: <NavLink to="/admin/dashboard">Dashboard</NavLink>,
-//   },
-//   {
-//     key: "User Management",
-//     label: "User Management",
-//     children: [
-//       {
-//         key: "Create Admin",
-//         label: <NavLink to="/admin/create-admin">Create Admin</NavLink>,
-//       },
-//       {
-//         key: "Create Faculty",
-//         label: <NavLink to="/admin/create-faculty">Create Faculty</NavLink>,
-//       },
-//       {
-//         key: "Create Student",
-//         label: <NavLink to="/admin/create-student">Create Student</NavLink>,
-//       },
-//     ],
-//   },
-// ];

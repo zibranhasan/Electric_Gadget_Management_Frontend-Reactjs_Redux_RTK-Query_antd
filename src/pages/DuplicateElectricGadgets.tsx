@@ -6,8 +6,10 @@ import {
   useGetGadgetsByIdQuery,
 } from "@/redux/features/electricGadgetsManagement.Api";
 import { useLocation, useNavigate } from "react-router-dom";
+import Dropzone from "react-dropzone";
+import axios from "axios";
 
-type FormData = {
+type FormDataType = {
   name: string;
   price: string;
   quantity: number;
@@ -17,23 +19,20 @@ type FormData = {
   category: string;
   operatingSystem: string;
   powerSource: string;
-  connectivity: string | string[]; // Change the type here
-  features: string | string[]; // Change the type here
+  connectivity: string | string[];
+  features: string | string[];
   weight: number;
+  photo: File | null;
 };
 
 const DuplicateElectricGadgets = () => {
   const location = useLocation();
-  const preFilledDataa = location.state?.preFilledData || {};
+  const preFilledData = location.state?.preFilledData || {};
   const navigate = useNavigate();
 
-  const { data: singleGadgetData } = useGetGadgetsByIdQuery(
-    preFilledDataa?._id
-  );
-
+  const { data: singleGadgetData } = useGetGadgetsByIdQuery(preFilledData?._id);
   const [addGadgets, { isLoading }] = useAddGadgetsMutation();
-
-  const { register, handleSubmit, setValue } = useForm<FormData>();
+  const { register, handleSubmit, setValue } = useForm<FormDataType>();
 
   useEffect(() => {
     if (!isLoading && singleGadgetData) {
@@ -52,64 +51,91 @@ const DuplicateElectricGadgets = () => {
         weight,
       } = singleGadgetData.data;
 
-      // Set form values using setValue
-      setValue("name", name);
-      setValue("price", price);
-      setValue("quantity", quantity);
-      setValue("releaseDate", new Date(releaseDate)); // Convert to Date
-      setValue("brand", brand);
-      setValue("modelNumber", modelNumber);
-      setValue("category", category);
-      setValue("operatingSystem", operatingSystem);
-
-      // Check if connectivity is a string before splitting
-      setValue("connectivity", connectivity);
-      // Check if features is a string before splitting
-      setValue("powerSource", powerSource);
-      setValue("features", features);
-      setValue("weight", weight);
+      setValue("name", name || "");
+      setValue("price", price || "");
+      setValue("quantity", quantity || "");
+      setValue("releaseDate", new Date(releaseDate));
+      setValue("brand", brand || "");
+      setValue("modelNumber", modelNumber || "");
+      setValue("category", category || "");
+      setValue("operatingSystem", operatingSystem || "");
+      setValue(
+        "connectivity",
+        Array.isArray(connectivity)
+          ? connectivity
+          : connectivity
+          ? connectivity.split(",")
+          : []
+      );
+      setValue("powerSource", powerSource || "");
+      setValue(
+        "features",
+        Array.isArray(features) ? features : features ? features.split(",") : []
+      );
+      setValue("weight", weight || "");
     }
   }, [isLoading, singleGadgetData, setValue]);
 
-  const onSubmit: SubmitHandler<FormData> = async (formData) => {
-    // Ensure connectivity is an array
-    const connectivityArray = Array.isArray(formData?.connectivity)
-      ? formData?.connectivity
-      : typeof formData?.connectivity === "string"
-      ? formData?.connectivity.split(",")
-      : [];
+  const onSubmit: SubmitHandler<FormDataType> = async (formData) => {
+    const formDataToSend = new FormData();
+    formDataToSend.append("image", formData.photo || "");
 
-    // Ensure features is an array
-    const featuresArray = Array.isArray(formData?.features)
-      ? formData?.features
-      : typeof formData?.features === "string"
-      ? formData?.features.split(",")
-      : [];
-
-    const dataToSend = {
-      ...formData,
-      connectivity: connectivityArray,
-      features: featuresArray,
-    };
     try {
-      // Trigger the mutation
+      const response = await axios.post(
+        "https://api.imgbb.com/1/upload?key=963ca9297bc7cea248773301a33b8428",
+        formDataToSend
+      );
+      const connectivityArray = Array.isArray(formData.connectivity)
+        ? formData.connectivity
+        : formData.connectivity
+        ? formData.connectivity.split(",")
+        : [];
+      const featuresArray = Array.isArray(formData.features)
+        ? formData.features
+        : formData.features
+        ? formData.features.split(",")
+        : [];
+
+      const dataToSend = {
+        ...formData,
+        photo: response.data.data.display_url,
+        connectivity: connectivityArray,
+        features: featuresArray,
+      };
+
       await addGadgets(dataToSend);
-
-      // Check if the mutation was successful
-
-      message.success("Gadgets created successfully");
-      // Redirect to the specified URL after successful creation
-      navigate("/dashboard/get-electric-gadgets-by-filtering");
-
-      // Submit data to backend or perform necessary action
+      message.success("Gadget duplicated successfully");
+      navigate("/dashboard/manager/get-electric-gadgets-by-filtering");
     } catch (error) {
-      // Handle error if the mutation fails
-      message.error("Error creating gadget");
+      message.error("Error duplicating gadget");
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+      <div style={{ margin: "10px 0" }}>
+        <label htmlFor="photo">Photo:</label>
+        <Dropzone
+          onDrop={(acceptedFiles) => {
+            setValue("photo", acceptedFiles[0]);
+          }}
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div
+              {...getRootProps()}
+              style={{
+                border: "1px dashed #ccc",
+                padding: "20px",
+                cursor: "pointer",
+              }}
+            >
+              <input {...getInputProps()} />
+              <p>Drag 'n' drop some files here, or click to select files</p>
+            </div>
+          )}
+        </Dropzone>
+      </div>
+
       <div
         style={{ margin: "10px 0", display: "flex", flexDirection: "column" }}
       >
@@ -230,23 +256,3 @@ const DuplicateElectricGadgets = () => {
 };
 
 export default DuplicateElectricGadgets;
-{
-  /* <DatePicker
-style={{ width: "100%" }}
-format="YYYY-MM-DD"
-{...register("releaseDate")}
-onChange={(date, dateString) =>
-  setValue("releaseDate", new Date(dateString), { shouldDirty: true })
-}
-/> */
-}
-
-// const DuplicateElectricGadgets = () => {
-//   return (
-//     <div>
-//       <h1>DuplicateElectricGadgets</h1>
-//     </div>
-//   );
-// };
-
-// export default DuplicateElectricGadgets;

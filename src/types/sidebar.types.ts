@@ -54,6 +54,7 @@ export interface ElectricGadget {
   _id: string;
   name: string;
   price: number;
+  photo: string;
   quantity: number;
   releaseDate: Date;
   brand: string;
@@ -65,6 +66,7 @@ export interface ElectricGadget {
   features?: string[];
   weight?: number;
   dimensions?: string;
+  photoUrl: string;
 }
 export interface SaleItem {
   _id: string;
