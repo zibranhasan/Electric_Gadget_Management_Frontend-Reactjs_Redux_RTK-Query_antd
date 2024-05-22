@@ -11,6 +11,7 @@ import {
   useGetOrdersByUserIdQuery,
   useUpdateCartMutation,
 } from "./redux/features/cartApi";
+import { DecodedToken, Order, OrderItem } from "./types/cartTypes";
 
 const { Meta } = Card;
 
@@ -21,7 +22,7 @@ const ElectricGadgetsManagement = () => {
 
   useEffect(() => {
     if (token) {
-      const decoded: any = jwtDecode(token);
+      const decoded: DecodedToken = jwtDecode(token);
       setUserId(decoded.userId);
     } else {
       setRedirectToLogin(true);
@@ -37,8 +38,8 @@ const ElectricGadgetsManagement = () => {
   console.log(ordersData);
   const orderedGadgetIds = useMemo(() => {
     if (!ordersData) return [];
-    return ordersData.flatMap((order: any) =>
-      order.items.map((item: any) => item.gadgetsId._id.toString())
+    return ordersData.flatMap((order: Order) =>
+      order.items.map((item: OrderItem) => item.gadgetsId._id.toString())
     );
   }, [ordersData]);
 

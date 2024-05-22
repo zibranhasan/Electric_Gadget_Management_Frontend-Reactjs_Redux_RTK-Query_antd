@@ -10,6 +10,7 @@ import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 import { Card, Row, Col, Button } from "antd";
 import { useAddTransactionsMutation } from "@/redux/features/transactionApi";
+import { DecodedToken, Order, OrderItem } from "@/types/cartTypes";
 
 const Checkout = () => {
   const [addTransaction] = useAddTransactionsMutation();
@@ -22,7 +23,7 @@ const Checkout = () => {
 
   useEffect(() => {
     if (token) {
-      const decoded: any = jwtDecode(token);
+      const decoded: DecodedToken = jwtDecode(token);
       setUserId(decoded.userId);
     }
   }, [token]);
@@ -34,14 +35,14 @@ const Checkout = () => {
   const handleUpdateQuantity = async (gadgetsId: string, change: number) => {
     if (!userId || !ordersData) return;
 
-    const orderContainingGadgetsId = ordersData.find((order) =>
+    const orderContainingGadgetsId = ordersData.find((order: Order) =>
       order.items.find((i) => i.gadgetsId._id === gadgetsId)
     );
 
     if (!orderContainingGadgetsId) return;
 
     const itemContainingGadgetsId = orderContainingGadgetsId.items.find(
-      (item) => item.gadgetsId._id === gadgetsId
+      (item: OrderItem) => item.gadgetsId._id === gadgetsId
     );
 
     if (!itemContainingGadgetsId || !itemContainingGadgetsId.gadgetsId) return;
@@ -81,18 +82,24 @@ const Checkout = () => {
 
   const totalQuantity = ordersData
     ? ordersData.reduce(
-        (acc, order) =>
-          acc + order.items.reduce((sum, item) => sum + item.quantity, 0),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (acc: any, order: any) =>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          acc +
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          order.items.reduce((sum: any, item: any) => sum + item.quantity, 0),
         0
       )
     : 0;
 
   const totalPrice = ordersData
     ? ordersData.reduce(
-        (acc, order) =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (acc: any, order: any) =>
           acc +
           order.items.reduce(
-            (sum, item) => sum + item.quantity * item.gadgetsId.price,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (sum: any, item: any) => sum + item.quantity * item.gadgetsId.price,
             0
           ),
         0
@@ -136,7 +143,7 @@ const Checkout = () => {
       <div style={{ width: "70%" }}>
         <Row gutter={[16, 16]}>
           {ordersData && ordersData.length > 0 ? (
-            ordersData.map((order) =>
+            ordersData.map((order: Order) =>
               order.items.map((item) => (
                 <Col span={8} key={item.gadgetsId._id}>
                   <Card
@@ -217,16 +224,26 @@ const Checkout = () => {
       </div>
 
       {/* Cart Summary */}
-      <div style={styles.cartSummary}>
-        <h2 style={styles.cartSummaryTitle}>Cart Summary</h2>
+      <div
+        style={{
+          maxWidth: "600px",
+          margin: "0 auto",
+          textAlign: "center",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          padding: "20px",
+          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <h2 style={{ fontSize: "24px", marginBottom: "20px" }}>Cart Summary</h2>
         {ordersData && ordersData.length > 0 ? (
-          ordersData.map((order) =>
+          ordersData.map((order: Order) =>
             order.items.map((item) => (
-              <div key={item.gadgetsId._id} style={styles.cartSummaryItem}>
-                <p style={styles.cartSummaryItemName}>
+              <div key={item.gadgetsId._id} style={{ marginBottom: "10px" }}>
+                <p style={{ marginBottom: "5px" }}>
                   <strong>{item.gadgetsId.name}</strong>
                 </p>
-                <p>
+                <p style={{ marginBottom: "5px" }}>
                   Quantity: {item.quantity} x ${item.gadgetsId.price} = $
                   {(item.quantity * item.gadgetsId.price).toFixed(2)}
                 </p>
@@ -237,15 +254,22 @@ const Checkout = () => {
           <p>No items in the cart.</p>
         )}
         <hr />
-        <p>
+        <p style={{ marginBottom: "10px" }}>
           <strong>Total Quantity:</strong> {totalQuantity}
         </p>
-        <p>
+        <p style={{ marginBottom: "20px" }}>
           <strong>Total Price:</strong> ${totalPrice.toFixed(2)}
         </p>
         <Button
           size="large"
-          style={styles.transactionButton}
+          style={{
+            backgroundColor: "#1890ff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "4px",
+            padding: "10px 20px",
+            cursor: "pointer",
+          }}
           onClick={showModal}
         >
           Transaction
@@ -287,31 +311,3 @@ const Checkout = () => {
 };
 
 export default Checkout;
-
-const styles = {
-  cartSummary: {
-    position: "fixed",
-    top: "80px", // Adjusted top to account for Navbar height
-    right: "20px",
-    width: "25%",
-    padding: "20px",
-    border: "1px solid #e8e8e8",
-    borderRadius: "8px",
-    backgroundColor: "#f9f9f9",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-  },
-  cartSummaryTitle: {
-    marginBottom: "20px",
-  },
-  cartSummaryItem: {
-    marginBottom: "10px",
-  },
-  cartSummaryItemName: {
-    fontSize: "16px",
-  },
-  transactionButton: {
-    width: "100%",
-    backgroundColor: "#4CAF50",
-    color: "white",
-  },
-};

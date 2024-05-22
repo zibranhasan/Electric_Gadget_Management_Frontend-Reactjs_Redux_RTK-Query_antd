@@ -11,8 +11,24 @@ import { useAppSelector } from "@/redux/hooks";
 import { Button, Card, Row, Select, Slider, Spin } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import {
+  DecodedToken,
+  ElectricGadget,
+  Order,
+  OrderItem,
+} from "@/types/cartTypes";
 
 const { Option } = Select;
+
+type FilterOptionsKey =
+  | "priceRange"
+  | "brand"
+  | "modelNumber"
+  | "category"
+  | "operatingSystem"
+  | "connectivity"
+  | "powerSource"
+  | "features";
 
 const AllProducts: React.FC = () => {
   const [categoryOptions, setCategoryOptions] = useState<
@@ -42,7 +58,7 @@ const AllProducts: React.FC = () => {
 
   useEffect(() => {
     if (token) {
-      const decoded: any = jwtDecode(token);
+      const decoded: DecodedToken = jwtDecode(token);
       setUserId(decoded.userId);
     }
   }, [token]);
@@ -52,16 +68,27 @@ const AllProducts: React.FC = () => {
       skip: !userId,
     });
 
+  // console.log(ordersData);
+
   const orderedGadgetIds = useMemo(() => {
     if (!ordersData) return [];
-    return ordersData.flatMap((order: any) =>
-      order.items.map((item: any) => item.gadgetsId._id.toString())
+    return ordersData.flatMap((order: Order) =>
+      order.items.map((item: OrderItem) => item.gadgetsId._id.toString())
     );
   }, [ordersData]);
 
   const [updateCart] = useUpdateCartMutation();
 
-  const [filterOptions, setFilterOptions] = useState({
+  const [filterOptions, setFilterOptions] = useState<{
+    priceRange: [number, number];
+    brand: string;
+    modelNumber: string;
+    category: string;
+    operatingSystem: string;
+    connectivity: string[];
+    powerSource: string;
+    features: string[];
+  }>({
     priceRange: [0, 99990],
     brand: "",
     modelNumber: "",
@@ -72,51 +99,115 @@ const AllProducts: React.FC = () => {
     features: [],
   });
 
-  const { data: gadgetsData } = useGetAllGadgetsQuery(undefined);
+  const { data: gadgetsData } = useGetAllGadgetsQuery("");
+  // console.log(gadgetsData);
 
+  //This is for category
   useEffect(() => {
-    if (gadgetsData && Array.isArray(gadgetsData.data)) {
-      const uniqueOptions = (key: string) =>
-        [...new Set(gadgetsData?.data.map((item) => item[key]))].map(
-          (value) => ({ value, label: value })
-        );
+    // Generate options for the Brand Select based on gadgetData
+    const categoryOptions = gadgetsData?.data?.map((item) => ({
+      value: item.category,
+      label: item.category,
+    }));
+    // Set the brand options in the state
+    setCategoryOptions(categoryOptions || []);
+  }, [gadgetsData]);
+  //This is for brand
+  useEffect(() => {
+    // Generate options for the Brand Select based on gadgetData
+    const options = gadgetsData?.data?.map((item) => ({
+      value: item.brand,
+      label: item.brand,
+    }));
+    // Set the brand options in the state
+    setBrandOptions(options || []);
+  }, [gadgetsData]);
+  //This is for model number
+  useEffect(() => {
+    // Generate options for the Brand Select based on gadgetData
+    const options = gadgetsData?.data?.map((item) => ({
+      value: item.modelNumber,
+      label: item.modelNumber,
+    }));
+    // Set the brand options in the state
+    setModelNumberOptions(options || []);
+  }, [gadgetsData]);
+  //This is for operating system
+  useEffect(() => {
+    // Generate options for the Brand Select based on gadgetData
+    const options = gadgetsData?.data?.map((item) => ({
+      value: item.operatingSystem,
+      label: item.operatingSystem,
+    }));
+    // Set the brand options in the state
+    setOperatingSystemOptions(options || []);
+  }, [gadgetsData]);
+  //This is for power source
+  useEffect(() => {
+    // Generate options for the Brand Select based on gadgetData
+    const options = gadgetsData?.data?.map((item) => ({
+      value: item.powerSource,
+      label: item.powerSource,
+    }));
 
-      setCategoryOptions(uniqueOptions("category"));
-      setBrandOptions(uniqueOptions("brand"));
-      setModelNumberOptions(uniqueOptions("modelNumber"));
-      setOperatingSystemOptions(uniqueOptions("operatingSystem"));
-      setPowerSourceOptions(uniqueOptions("powerSource"));
-
-      const mapOptions = (key: string) => {
-        const options = gadgetsData.data.reduce(
-          (acc: { value: string; label: string }[], item) => {
-            if (Array.isArray(item[key])) {
-              item[key].forEach((option) => {
-                acc.push({ value: option, label: option });
+    setPowerSourceOptions(options || []);
+  }, [gadgetsData]);
+  //This is for features
+  useEffect(() => {
+    // Generate options for the Power Source Select based on gadgetData
+    const options =
+      gadgetsData?.data?.reduce<{ value: string; label: string }[]>(
+        (acc, item) => {
+          if (Array.isArray(item.features)) {
+            item.features.forEach((featuresItem) => {
+              acc.push({
+                value: featuresItem || "", // Provide a default value if featuresItem is undefined
+                label: featuresItem || "",
               });
-            }
-            return acc;
-          },
-          []
-        );
-        return [
-          ...new Set(options.map((option) => JSON.stringify(option))),
-        ].map((option) => JSON.parse(option));
-      };
+            });
+          }
+          return acc;
+        },
+        []
+      ) || [];
+    setFeaturesOptions(options);
 
-      setFeaturesOptions(mapOptions("features"));
-      setConnectivityOptions(mapOptions("connectivity"));
-    }
+    setFeaturesOptions(options || []);
   }, [gadgetsData]);
 
-  const handleFilterChange = (key: string, value: any) => {
+  //This is for connectivity
+  useEffect(() => {
+    // Generate options for the Power Source Select based on gadgetData
+    const options =
+      gadgetsData?.data?.reduce<{ value: string; label: string }[]>(
+        (acc, item) => {
+          if (Array.isArray(item.connectivity)) {
+            item.connectivity.forEach((connectivityItem) => {
+              acc.push({
+                value: connectivityItem || "", // Provide a default value if connectivityItem is undefined
+                label: connectivityItem || "",
+              });
+            });
+          }
+          return acc;
+        },
+        []
+      ) || [];
+    setConnectivityOptions(options);
+  }, [gadgetsData]);
+
+  // console.log(categoryOptions);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleFilterChange = (key: FilterOptionsKey, value: any) => {
     setFilterOptions((prevOptions) => ({
       ...prevOptions,
       [key]: value,
     }));
   };
 
-  const handleMultiSelectChange = (key: string, values: any[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleMultiSelectChange = (key: FilterOptionsKey, values: any[]) => {
     setFilterOptions((prevOptions) => ({
       ...prevOptions,
       [key]: values,
@@ -130,9 +221,13 @@ const AllProducts: React.FC = () => {
   const { data: gadgetsDataResponse, isLoading: isGadgetsLoading } =
     useGetGadgetsByFilteringQuery(filterOptions);
 
-  const gadgetsDataByFiltering = gadgetsDataResponse?.data.response || [];
+  const gadgetsDataByFiltering: ElectricGadget[] = Array.isArray(
+    gadgetsDataResponse?.data?.response
+  )
+    ? gadgetsDataResponse.data.response
+    : [];
 
-  const handleAddToCart = async (gadget_Id: any) => {
+  const handleAddToCart = async (gadget_Id: string) => {
     try {
       await updateCart({ userId, gadgetsId: gadget_Id, quantity: 1 }).unwrap();
       console.log("Cart updated successfully");
@@ -147,7 +242,7 @@ const AllProducts: React.FC = () => {
 
   const renderFilterOptions = (
     label: string,
-    key: string,
+    key: FilterOptionsKey,
     options: { value: string | undefined; label: string | undefined }[],
     isMultiSelect = false
   ) => (
@@ -161,18 +256,21 @@ const AllProducts: React.FC = () => {
         placeholder={`Select ${label}`}
         style={{ width: 200, marginRight: 16 }}
         value={filterOptions[key]}
-        onChange={(value) =>
-          isMultiSelect
-            ? handleMultiSelectChange(key, value)
-            : handleFilterChange(key, value)
-        }
+        onChange={(value) => {
+          if (isMultiSelect) {
+            if (Array.isArray(value)) {
+              handleMultiSelectChange(key, value);
+            }
+          } else {
+            handleFilterChange(key, value);
+          }
+        }}
       >
         {options.length > 0 && (
           <>
-            <Option
-              key="heading"
-              disabled
-            >{`Filtering according to ${label.toLowerCase()}`}</Option>
+            <Option key="heading" disabled>
+              {`Filtering according to ${label.toLowerCase()}`}
+            </Option>
             {options.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
@@ -235,7 +333,7 @@ const AllProducts: React.FC = () => {
           <Button onClick={handleFilterSubmit}>Filter</Button>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap" }}>
-          {gadgetsDataByFiltering.map((gadget) => {
+          {gadgetsDataByFiltering.map((gadget: ElectricGadget) => {
             const isAddedToCart = orderedGadgetIds.includes(
               gadget._id.toString()
             );

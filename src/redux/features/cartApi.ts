@@ -1,5 +1,6 @@
-import { TQueryParam, TResponseRedux } from "@/types/sidebar.types";
+import { TQueryParam } from "@/types/sidebar.types";
 import { baseApi } from "../api/baseApi";
+import { OrdersResponse } from "@/types/cartTypes";
 
 const cartManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -18,7 +19,7 @@ const cartManagementApi = baseApi.injectEndpoints({
         };
       },
       providesTags: ["cart"],
-      transformResponse: (response: TResponseRedux<any[]>) => {
+      transformResponse: (response: OrdersResponse) => {
         return {
           data: response,
         };

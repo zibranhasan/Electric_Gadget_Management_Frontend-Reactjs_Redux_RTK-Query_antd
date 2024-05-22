@@ -1,0 +1,25 @@
+.cartSummary {
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+.cartSummaryTitle {
+  font-size: 18px; /* Corrected property name */
+  margin-bottom: 10px; /* Corrected property name */
+}
+
+.cartSummaryItem {
+  margin-bottom: 10px;
+}
+
+.cartSummaryItemName {
+  margin-bottom: 5px;
+}
+
+.transactionButton {
+  margin-top: 20px; /* Corrected property name */
+}

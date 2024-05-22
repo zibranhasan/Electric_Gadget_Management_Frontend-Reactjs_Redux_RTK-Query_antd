@@ -3,6 +3,7 @@ import {
   useGetAllOrdersQuery,
   useUpdateCartMutation,
 } from "@/redux/features/cartApi";
+import { OrderItem } from "@/types/cartTypes";
 import { Table, Button } from "antd";
 
 const OrderList = () => {
@@ -22,16 +23,19 @@ const OrderList = () => {
     gadgetsId: string,
     change: number
   ) => {
-    const orderContainingGadgetsId = ordersData?.data.find(
-      (order) =>
+    const orderContainingGadgetsId = ordersData?.data?.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (order: any) =>
         order.userId._id === userId &&
-        order.items.find((i) => i.gadgetsId._id === gadgetsId)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        order.items.find((i: any) => i.gadgetsId._id === gadgetsId)
     );
 
     if (!orderContainingGadgetsId) return;
 
     const itemContainingGadgetsId = orderContainingGadgetsId.items.find(
-      (item) => item.gadgetsId._id === gadgetsId
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (item: any) => item.gadgetsId._id === gadgetsId
     );
 
     if (!itemContainingGadgetsId || !itemContainingGadgetsId.gadgetsId) return;
@@ -73,27 +77,30 @@ const OrderList = () => {
     {
       title: "Sequence",
       key: "sequence",
-      render: (_, __, index) => index + 1,
+      render: (_: unknown, __: unknown, index: number) => index + 1,
     },
     {
       title: "User ID",
       dataIndex: "userId",
       key: "userId",
-      render: (user) => user._id,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: (user: any) => user._id,
     },
     {
       title: "Username",
       dataIndex: "userId",
       key: "username",
-      render: (user) => user.username,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: (user: any) => user.username,
     },
     {
       title: "Items",
       dataIndex: "items",
       key: "items",
-      render: (items, record) => (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: (items: any, record: any) => (
         <ul>
-          {items.map((item, itemIndex) => (
+          {items.map((item: OrderItem, itemIndex: number) => (
             <li key={item.gadgetsId._id}>
               {itemIndex + 1}. {item.gadgetsId.name} - Quantity: {item.quantity}
               <div>
@@ -139,13 +146,16 @@ const OrderList = () => {
   ];
 
   const dataSource = ordersData?.data
-    ? ordersData.data.map((order, index) => {
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ordersData.data.map((order: any, index: number) => {
         const totalQuantity = order.items.reduce(
-          (acc, item) => acc + item.quantity,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (acc: any, item: any) => acc + item.quantity,
           0
         );
         const totalPrice = order.items.reduce(
-          (acc, item) => acc + item.quantity * item.gadgetsId.price,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (acc: any, item: any) => acc + item.quantity * item.gadgetsId.price,
           0
         );
 
