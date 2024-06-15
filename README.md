@@ -1,4 +1,5 @@
 # Electric Gadgets Management System
+##Live Link:https://assignment-6-hs7hob0v3-zibranhasansourabgmailcoms-projects.vercel.app
 ## Manager info(for login):
 name:zibran hasan
 password:sourav
