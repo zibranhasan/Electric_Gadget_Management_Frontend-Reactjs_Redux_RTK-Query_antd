@@ -26,7 +26,7 @@ name:zibran hasan
 password:sourav
 
 ### user info(for login):
-name:zibrann
+name:zibran
 password:123456
 
 
